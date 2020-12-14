@@ -6,11 +6,11 @@ use Tests\TestCase;
 use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class BookReservationTest extends TestCase
+class BookControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_new_book_can_be_added()
+    public function test_a_new_book_can_be_created()
     {
         $response = $this->post('/books', [
             'title' => 'Introduction to TDD',
@@ -56,6 +56,7 @@ class BookReservationTest extends TestCase
 
         $this->assertEquals('New title', Book::first()->title);
         $this->assertEquals('New author', Book::first()->author);
+        $response->assertRedirect('/books/1');
     }
 
     public function test_a_book_can_be_updated_and_the_book_title_is_required()
@@ -71,7 +72,6 @@ class BookReservationTest extends TestCase
             'author' => 'New author'
         ]);
 
-        // $this->assertEquals('New title', Book::first()->title);
         $response->assertSessionHasErrors('title');
     }
 
@@ -100,8 +100,11 @@ class BookReservationTest extends TestCase
         ]);
 
         $response = $this->delete('/books/1');
-        $response->assertOK();
-        $this->assertNull(Book::find(1));
+
+        // $response->assertOK();
+        $this->assertCount(0, Book::all());
+        // $this->assertNull(Book::find(1));   
+        $response->assertRedirect('/books');
     }
 
 }
